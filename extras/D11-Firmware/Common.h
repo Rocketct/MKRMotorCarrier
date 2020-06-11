@@ -26,7 +26,10 @@ enum Commands {
   GET_INTERNAL_TEMP,
   CLEAR_IRQ,
   GET_FREE_RAM,
-  GET_PID_VAL
+  GET_PID_VAL,
+  SET_SERVO_PIN_MODE,
+  GET_PIN_VALUE,
+  SET_PIN_VALUE
 };
 
 enum IRQCause {
@@ -43,7 +46,6 @@ enum IRQCause {
 #define MOTOR_2_COUNTER   TC1
 #define MOTOR_1_COUNTER   TC2
 
-#include "config.h"
 #ifdef NANO_MOTOR_CARRIER
 #define MOTOR_2_PIN_A     5
 #define MOTOR_2_PIN_B     4

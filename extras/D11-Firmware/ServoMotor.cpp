@@ -13,3 +13,15 @@ void ServoMotor::setFrequency(int frequency) {
   // NB: not implemented at the moment!
   //this->frequency = frequency;
 }
+
+void ServoMotor::setPinMode(int status) {
+  pinMode(pin, status);
+}
+
+int ServoMotor::getPinValue() {
+  digitalRead(pin);
+}
+
+void ServoMotor::setPinValue(int value) {
+  digitalwrite(pin, value);
+}

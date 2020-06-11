@@ -14,7 +14,8 @@
 // compile me with target arduino:samd:mkrmotorshield:bootloader=0kb,pinmap=complete,lto=disabled during development
 // compile me with target arduino:samd:mkrmotorshield:bootloader=4kb,pinmap=complete,lto=enabled for release
 
-const char* FW_VERSION = "2.00";
+
+const char* FW_VERSION = "0.20";
 
 DCMotor* dcmotors[2];
 ServoMotor* servos[4];
@@ -47,6 +48,8 @@ void setup() {
 
   dcmotors[0] = new DCMotor(MOTOR_1_COUNTER, MOTOR_1_PIN_A, MOTOR_1_PIN_B);
   dcmotors[1] = new DCMotor(MOTOR_2_COUNTER, MOTOR_2_PIN_A, MOTOR_2_PIN_B),
+
+// qui i pin vediamo se esiste un punto dove si puo usa gia qalcosa per leggere e scrivere
 
   servos[0] = new ServoMotor(PWM_PIN_SERVO_1);
   servos[1] = new ServoMotor(PWM_PIN_SERVO_2);
@@ -127,6 +130,12 @@ void receiveEvent(int howMany) {
       break;
     case SET_PWM_FREQUENCY_SERVO:
       servos[target]->setFrequency(value);
+      break;
+    case SET_SERVO_PIN_MODE:
+      servos[target]->setPinMode(value);
+      break;
+    case SET_PIN_VALUE:
+      servos[target]->setPinValue(value);
       break;
     case SET_PWM_DUTY_CYCLE_DC_MOTOR:
       ((PIDWrapper*)dcmotors[target]->pid)->stop();
@@ -230,7 +239,9 @@ void requestEvent() {
       pidGains.D = gains[2];
 
       Wire.write((uint8_t*)&pidGains, sizeof(pidGains));
-
+      break;
+    case GET_PIN_VALUE:
+      Wire.write((servos[target]->getPinValue()));
       break;
   }
   interrupts();
