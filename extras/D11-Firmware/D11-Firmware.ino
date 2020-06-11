@@ -5,7 +5,6 @@
 #include "ServoMotor.h"
 #include "Common.h"
 #include "Events.h"
-#include "PID.h"
 #include "FreeRAM.h"
 
 #define Fix16 mn::MFixedPoint::FpF32<8>
@@ -14,16 +13,14 @@
 // compile me with target arduino:samd:mkrmotorshield:bootloader=0kb,pinmap=complete,lto=disabled during development
 // compile me with target arduino:samd:mkrmotorshield:bootloader=4kb,pinmap=complete,lto=enabled for release
 
-<<<<<<< HEAD
-const char* FW_VERSION = "2.00";
-=======
-const char* FW_VERSION = "0.20";
->>>>>>> 0b1580d... Update fw version to 0.20
+
+const char* FW_VERSION = "0.30";
+
 
 DCMotor* dcmotors[2];
 ServoMotor* servos[4];
 EncoderWrapper* encoders[2];
-PIDWrapper* pid_control[2];
+
 Battery* battery;
 
 void led_on() {
@@ -49,7 +46,7 @@ void setup() {
   //temp_init();
   battery = new Battery(ADC_BATTERY);
 
-  dcmotors[0] = new DCMotor(MOTOR_1_COUNTER, MOTOR_1_PIN_A, MOTOR_1_PIN_B);
+
   dcmotors[1] = new DCMotor(MOTOR_2_COUNTER, MOTOR_2_PIN_A, MOTOR_2_PIN_B),
 
   servos[0] = new ServoMotor(PWM_PIN_SERVO_1);
@@ -59,9 +56,6 @@ void setup() {
 
   encoders[0] = new EncoderWrapper(ENCODER_2_PIN_A, ENCODER_2_PIN_B, 1);
   encoders[1] = new EncoderWrapper(ENCODER_1_PIN_A, ENCODER_1_PIN_B, 0);
-
-  pid_control[0] = new PIDWrapper(encoders[0]->position, encoders[0]->velocity, dcmotors[0], 0, 10, 100); //10ms period velo, 100ms period pos
-  pid_control[1] = new PIDWrapper(encoders[1]->position, encoders[1]->velocity, dcmotors[1], 1, 10, 100);
 
   Wire.begin(I2C_ADDRESS);
   Wire.onRequest(requestEvent);
@@ -132,9 +126,11 @@ void receiveEvent(int howMany) {
     case SET_PWM_FREQUENCY_SERVO:
       servos[target]->setFrequency(value);
       break;
-    case SET_PWM_DUTY_CYCLE_DC_MOTOR:
-      ((PIDWrapper*)dcmotors[target]->pid)->stop();
-      dcmotors[target]->setDuty(value);
+    case SET_SERVO_PIN_MODE:
+      servos[target]->setPinMode(value);
+      break;
+    case SET_PIN_VALUE:
+      servos[target]->writeOutput(value);
       break;
     case SET_PWM_FREQUENCY_DC_MOTOR:
       dcmotors[target]->setFrequency(value);
@@ -147,36 +143,6 @@ void receiveEvent(int howMany) {
       break;
     case SET_INTERRUPT_ON_VELOCITY_ENCODER:
       encoders[target]->setIrqOnVelocity(value);
-      break;
-    case SET_PID_GAIN_CL_MOTOR:
-      {
-        Fix16 P = *((Fix16*)&buf[0]);
-        Fix16 I = *((Fix16*)&buf[4]);
-        Fix16 D = *((Fix16*)&buf[8]);
-        pid_control[target]->setGains(P, I, D);
-        break;
-      }
-    case RESET_PID_GAIN_CL_MOTOR:
-      pid_control[target]->resetGains();
-      break;
-    case SET_CONTROL_MODE_CL_MOTOR:
-      pid_control[target]->setControlMode((cl_control)value);
-      break;
-    case SET_POSITION_SETPOINT_CL_MOTOR:
-      pid_control[target]->setSetpoint(TARGET_POSITION, Fix16(value * 1.0)); //Change to integer. "value" is a 32 bit data type in this case (int).
-      break;
-    case SET_VELOCITY_SETPOINT_CL_MOTOR:
-      pid_control[target]->setSetpoint(TARGET_VELOCITY, Fix16(value * 1.0)); //Change to integer
-      break;
-    case SET_MAX_ACCELERATION_CL_MOTOR: {
-        pid_control[target]->setMaxAcceleration(Fix16(value * 1.0));
-        break;
-      }
-    case SET_MAX_VELOCITY_CL_MOTOR:
-      pid_control[target]->setMaxVelocity(Fix16(value * 1.0));
-      break;
-    case SET_MIN_MAX_DUTY_CYCLE_CL_MOTOR:
-      pid_control[target]->setLimits(*((int16_t*)&buf[0]), *((int16_t*)&buf[2]));
       break;
   }
   interrupts();
@@ -224,17 +190,8 @@ void requestEvent() {
     case GET_FREE_RAM:
       Wire.write((int)FreeRam());
       break;
-    case GET_PID_VAL:
-      Fix16 gains[3];
-      pid_control[target]->getGains((Fix16*)gains);
-
-      PIDGains pidGains;
-      pidGains.P = gains[0];
-      pidGains.I = gains[1];
-      pidGains.D = gains[2];
-
-      Wire.write((uint8_t*)&pidGains, sizeof(pidGains));
-
+    case GET_PIN_VALUE:
+      Wire.write((servos[target]->readInput()));
       break;
   }
   interrupts();

@@ -92,8 +92,5 @@ d21::DCMotor M4;
 mc::Encoder encoder1;
 mc::Encoder encoder2;
 
-mc::PID pid1;
-mc::PID pid2;
-
 mc::Battery battery;
 

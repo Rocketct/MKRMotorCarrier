@@ -24,7 +24,6 @@
 #include "ServoMotor.h"
 #include "MotorController.h"
 #include "Common.h"
-#include "PID.h"
 #include "src/FpF.hpp"
 
 extern mc::MotorController controller;
@@ -41,9 +40,6 @@ extern d21::DCMotor M4;
 
 extern mc::Encoder encoder1;
 extern mc::Encoder encoder2;
-
-extern mc::PID pid1;
-extern mc::PID pid2;
 
 extern mc::Battery battery;
 

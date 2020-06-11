@@ -24,6 +24,9 @@ class ServoMotor {
     void setAngle(int angle);
     void detach();
     void setFrequency(int frequency);
+    void setPinMode(int status);
+    void writeOutput(int value);
+    int  readInput();
   private:
     int instance;
 };

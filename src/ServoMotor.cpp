@@ -35,3 +35,17 @@ void mc::ServoMotor::detach() {
 void mc::ServoMotor::setFrequency(int frequency) {
   setData(SET_PWM_FREQUENCY_SERVO, instance, frequency);
 }
+
+void mc::ServoMotor::setPinMode(int status) {
+  setData(SET_SERVO_PIN_MODE, instance, status);
+}
+
+void mc::ServoMotor::writeOutput(int value) {
+  setData(SET_PIN_VALUE, instance, value);
+}
+
+int mc::ServoMotor::readInput() {
+  int ret;
+  int stat = getData(GET_PIN_VALUE, instance,(uint8_t*)&ret);
+  return ret;
+}
