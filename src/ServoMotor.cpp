@@ -40,7 +40,7 @@ void mc::ServoMotor::setPinMode(int status) {
   setData(SET_SERVO_PIN_MODE, instance, status);
 }
 
-void mc::ServoMotor::void writeOutput(int value) {
+void mc::ServoMotor::writeOutput(int value) {
   setData(SET_PIN_VALUE, instance, value);
 }
 
