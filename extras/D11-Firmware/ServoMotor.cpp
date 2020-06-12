@@ -18,10 +18,10 @@ void ServoMotor::setPinMode(int status) {
   pinMode(pin, status);
 }
 
-int ServoMotor::getPinValue() {
-  digitalRead(pin);
+int ServoMotor::readInput() {
+  return digitalRead(pin);
 }
 
-void ServoMotor::setPinValue(int value) {
-  digitalwrite(pin, value);
+void ServoMotor::writeOutput(int value) {
+  digitalWrite(pin, value);
 }

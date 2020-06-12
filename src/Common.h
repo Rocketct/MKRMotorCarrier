@@ -44,8 +44,8 @@ enum Commands {
   GET_FREE_RAM,
   GET_PID_VAL,
   SET_SERVO_PIN_MODE,
-  GET_PIN_VAL,
-  SET__PIN_VAL
+  GET_PIN_VALUE,
+  SET_PIN_VALUE
   };
 
 enum IRQCause {

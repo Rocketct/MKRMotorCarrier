@@ -15,7 +15,7 @@
 // compile me with target arduino:samd:mkrmotorshield:bootloader=4kb,pinmap=complete,lto=enabled for release
 
 
-const char* FW_VERSION = "0.20";
+const char* FW_VERSION = "0.30";
 
 DCMotor* dcmotors[2];
 ServoMotor* servos[4];
@@ -135,7 +135,7 @@ void receiveEvent(int howMany) {
       servos[target]->setPinMode(value);
       break;
     case SET_PIN_VALUE:
-      servos[target]->setPinValue(value);
+      servos[target]->writeOutput(value);
       break;
     case SET_PWM_DUTY_CYCLE_DC_MOTOR:
       ((PIDWrapper*)dcmotors[target]->pid)->stop();
@@ -229,6 +229,9 @@ void requestEvent() {
     case GET_FREE_RAM:
       Wire.write((int)FreeRam());
       break;
+    case GET_PIN_VALUE:
+      Wire.write((int)(servos[target]->readInput()));
+      break;
     case GET_PID_VAL:
       Fix16 gains[3];
       pid_control[target]->getGains((Fix16*)gains);
@@ -239,9 +242,6 @@ void requestEvent() {
       pidGains.D = gains[2];
 
       Wire.write((uint8_t*)&pidGains, sizeof(pidGains));
-      break;
-    case GET_PIN_VALUE:
-      Wire.write((servos[target]->getPinValue()));
       break;
   }
   interrupts();

@@ -8,8 +8,8 @@ class ServoMotor {
     void setDuty(int duty);
     void setFrequency(int frequency);
     void setPinMode(int status);
-    void setPinValue(int value);
-    int  getPinValue();
+    void writeOutput(int value);
+    int  readInput();
   private:
     int pin;
     int duty = 0;
